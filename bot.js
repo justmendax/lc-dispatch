@@ -31,7 +31,7 @@ client.on("ready", () => {
 
     const embed = new MessageEmbed()
         .setColor(client.guilds.cache.get(hostGuild).me.displayHexColor)
-        .addField(`Bot __*${client.user.username}*__ loaded successfully! :boar:`, `**Prefix: \`${prefix}\`\n\nCommand status:**`)
+        .addField(`Bot __*${client.user.username}*__ loaded successfully!`, `**Prefix: \`${prefix}\`\n\nCommand status:**`)
         .setFooter(client.user.username, client.user.avatarURL())
         .setTimestamp();
 
