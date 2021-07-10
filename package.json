@@ -1,0 +1,11 @@
+{
+  "name": "lcdoc",
+  "version": "1.0.0",
+  "description": "Liberty City Department of Corrections Bot",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mendax",
+  "license": "ISC"
+}
