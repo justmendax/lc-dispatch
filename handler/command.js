@@ -1,3 +1,4 @@
+const { ApplicationCommandManager } = require("discord.js");
 const { readdirSync } = require("fs");
 const ascii = require("ascii-table");
 
@@ -15,10 +16,10 @@ module.exports = (client) => {
 
             if (pull.name) {
                 client.commands.set(pull.name, pull);
-                table.addRow(file, '✔');
+                table.addRow(file, 'Y');
                 statusArray.push([file, true]);
             } else {
-                table.addRow(file, '❌');
+                table.addRow(file, 'N');
                 statusArray.push([file, false]);
                 continue;
             }
@@ -29,7 +30,7 @@ module.exports = (client) => {
             enabled.push(pull.name);
         }
     });
-
+    
     console.log(table.toString());
 }
 

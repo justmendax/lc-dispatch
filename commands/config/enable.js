@@ -9,18 +9,36 @@ module.exports = {
     category: "config",
     description: "Enables a command you enter",
     usage: "<command>",
-    run: async (client, message, args) => {
-        if (message.author.id !== '251758061981532162')
-            return message.channel.send(`Only ${message.guild.members.cache.get("251758061981532162").user.tag} can use this command!`)
+    options: [{
+        type: "STRING",
+        name: "command",
+        description: "Enter the name of a command to enable.",
+        required: true
+    }],
+    defaultPermission: false,
+    permissions: [{
+        id: '251758061981532162',
+        type: 'USER',
+        permission: true
+    }],
+    guildId: [hostGuild],
+    run: async (client, interaction) => {
+        const input = interaction.options.first().value;
+        const embed = new MessageEmbed()
+            .setColor(3092790)
+            .setTimestamp()
+            .setAuthor(interaction.user.tag, interaction.user.avatarURL())
+            .setFooter(client.user.username, client.user.avatarURL())
 
-        if (!args[0])
-            return message.channel.send("Give me a command to enable you fucking retard.")
+        if(!commandArray.some(cmd => cmd[0] == input + ".js")) {
+            embed.setTitle(`The \`${input}\` command doesn't exist.`);
+            return interaction.reply({ embeds: [embed] });
+        }
 
-        if(!commandArray.some(cmd => cmd[0] === args[0] + ".js"))
-            return message.channel.send("That command doesn't exist, moron.")
-
-        if(enabled[enabled.indexOf(args[0])])
-            return message.channel.send("That command is already enabled, idiot.")
+        if(enabled[enabled.indexOf(input)]) {
+            embed.setTitle(`The \`${input}\` command is already enabled.`);
+            return interaction.reply({ embeds: [embed] });
+        }
 
         readdirSync("./commands/").forEach(dir => {
             
@@ -29,20 +47,14 @@ module.exports = {
             for (let file of commands) {
                 let pull = require(`../${dir}/${file}`)
 
-                if (pull.name === args[0]) {
+                if (pull.name == input) {
                     client.commands.set(pull.name, pull);
                     enabled.push(pull.name);
                     break;
                 }
             }
         });
-
-        const embed = new MessageEmbed()
-            .setColor(client.guilds.cache.get(hostGuild).me.displayHexColor)
-            .setTimestamp()
-            .setAuthor(message.author.tag, message.author.avatarURL())
-            .setFooter(client.user.username, client.user.avatarURL())
-            .setTitle(`The \`${args[0]}\` command has been enabled successfully! :boar:`);
-        message.channel.send(embed);
+        embed.setTitle(`The \`${input}\` command has been enabled successfully!`);
+        interaction.reply({ embeds: [embed] });
     }
 }

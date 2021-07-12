@@ -3,11 +3,11 @@ require("dotenv").config();
 module.exports = {
     updatePresence: function(client) {
         return client.user.setPresence({
-        activity: {
-		name: `over Liberty City. (v${process.env.VERSION})`,
-		type: 'WATCHING'
-	},
-	status: "online"
+            activities: [{
+                name: `over Liberty City. (v${process.env.VERSION})`,
+                type: 'WATCHING'
+            }],
+	        status: "online"
         });
     },
 

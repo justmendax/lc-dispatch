@@ -1,54 +1,61 @@
 const { MessageEmbed } = require("discord.js");
-const { prefix } = require("../../bot.js");
-const { hostGuild } = require("../../bot.js");
 
 module.exports = {
     name: "help",
     category: "info",
     description: "Returns all commands, or one specific command info",
     usage: "[command | alias]",
-    run: async (client, message, args) => {
-        if (args[0]) {
-            return getCMD(client, message, args[0]);
+    options: [{
+        type: "STRING",
+        name: "command",
+        description: "Enter the name or alias of a command if you need info about it.",
+        required: false
+    }],
+    run: async (client, interaction) => {
+        if (interaction.options.first()) {
+            return getCMD(client, interaction);
         }
         else {
-            return getAll(client, message);
+            return getAll(client, interaction);
         }
     }
 }
 
-function getAll (client, message) {
+function getAll (client, interaction) {
     const embed = new MessageEmbed()
-        .setColor(client.guilds.cache.get(hostGuild).me.displayHexColor)
+        .setColor(3092790);
 
     const commands = (category) => {
         return client.commands
             .filter(cmd => cmd.category === category)
-            .map(cmd => `${prefix + cmd.name} - ${cmd.description}`)
+            .map(cmd => `${"/" + cmd.name} - ${cmd.description}`)
             .join("\n");
     }
 
     const info = client.categories
         .map(cat => {
-            if(message.author.id != "251758061981532162" && cat == "config")
+            if(interaction.user.id != client.application.owner.id && cat == "config")
                 return "";
             else
                 return `\n__**${cat[0].toUpperCase() + cat.slice(1)}**__ \n${commands(cat)}`;
         })
         .reduce((string, category) => string + "\n" + category);
 
-    return message.channel.send(embed.setDescription(info));
+    embed.setDescription(info);
+    return interaction.reply({ embeds: [embed] });
 }
 
-function getCMD (client, message, input) {
-    const embed = new MessageEmbed()
+function getCMD (client, interaction) {
+    const embed = new MessageEmbed();
+    const input = interaction.options.first().value;
 
     const cmd = client.commands.get(input.toLowerCase()) || client.commands.get(client.aliases.get(input.toLowerCase()));
 
     let info = `No information found for command **${input.toLowerCase()}**.`;
 
     if (!cmd) {
-        return message.channel.send(embed.setColor("RED").setDescription(info).setFooter(client.user.username, client.user.avatarURL()).setTimestamp());
+        embed.setColor("RED").setDescription(info).setFooter(client.user.username, client.user.avatarURL()).setTimestamp();
+        return interaction.reply({ embeds: [embed] });
     }
 
     if (cmd.name) info = `**Command Name**: ${cmd.name}`;
@@ -57,5 +64,6 @@ function getCMD (client, message, input) {
     if (cmd.usage)
         info += `\n**Usage**: ${cmd.usage} (Syntax: <> = required, [] = optional)`;
 
-    return message.channel.send(embed.setColor("GREEN").setDescription(info).setFooter(client.user.username, client.user.avatarURL()).setTimestamp());
+    embed.setColor("GREEN").setDescription(info).setFooter(client.user.username, client.user.avatarURL()).setTimestamp();
+    return interaction.reply({ embeds: [embed] });
 }

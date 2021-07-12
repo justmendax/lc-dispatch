@@ -7,31 +7,45 @@ module.exports = {
     category: "config",
     description: "Disables a command you enter",
     usage: "<command>",
-    run: async (client, message, args) => {
-        if (message.author.id !== '251758061981532162')
-            return message.channel.send(`Only **${message.guild.members.cache.get("251758061981532162").user.tag}** can use this command!`)
-
-        if (!args[0])
-            return message.channel.send("Give me a command to disable you fucking retard.")
-
-        if(client.commands.some(cmd => cmd.name === args[0] && cmd.category === "config"))
-            return message.channel.send("You tried. :boar:")
-
-        if(!client.commands.some(cmd => cmd.name === args[0]))
-            return message.channel.send("That command doesn't exist, moron.")
-
-        if(!enabled[enabled.indexOf(args[0])])
-            return message.channel.send("That command is already disabled, idiot.")
-
-        client.commands.delete(args[0]);
-        enabled.splice(enabled.indexOf(args[0]), 1);
-
+    options: [{
+        type: "STRING",
+        name: "command",
+        description: "Enter the name of a command to disable.",
+        required: true
+    }],
+    defaultPermission: false,
+    permissions: [{
+        id: '251758061981532162',
+        type: 'USER',
+        permission: true
+    }],
+    guildId: [hostGuild],
+    run: async (client, interaction) => {
+        const input = interaction.options.first().value;
         const embed = new MessageEmbed()
-            .setColor(client.guilds.cache.get(hostGuild).me.displayHexColor)
+            .setColor(3092790)
             .setTimestamp()
-            .setAuthor(message.author.tag, message.author.avatarURL())
+            .setAuthor(interaction.user.tag, interaction.user.avatarURL())
             .setFooter(client.user.username, client.user.avatarURL())
-            .setTitle(`The \`${args[0]}\` command has been disabled successfully! :boar:`);
-        message.channel.send(embed);
+
+        if(client.commands.some(cmd => cmd.name == input && cmd.category == "config")) {
+            embed.setTitle("You tried.");
+            return interaction.reply({ embeds: [embed] });
+        }
+
+        if(!client.commands.some(cmd => cmd.name == input)) {
+            embed.setTitle(`The \`${input}\` command doesn't exist.`);
+            return interaction.reply({ embeds: [embed] });
+        }
+
+        if(!enabled[enabled.indexOf(input)]) {
+            embed.setTitle(`The \`${input}\` command is already disabled.`);
+            return interaction.reply({ embeds: [embed] });
+        }
+
+        client.commands.delete(input);
+        enabled.splice(enabled.indexOf(input), 1);
+        embed.setTitle(`The \`${input}\` command has been disabled successfully!`);
+        interaction.reply({ embeds: [embed] });
     }
 }
