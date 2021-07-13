@@ -10,6 +10,7 @@ client.commands = new Collection();
 client.aliases = new Collection();
 client.categories = fs.readdirSync("./commands/");
 client.activated = new Collection();
+client.muteTimeouts = new Collection();
 
 const hostGuild = process.env.HOST_GUILD;
 module.exports.hostGuild = hostGuild;
@@ -57,7 +58,7 @@ client.on('messageCreate', async message => {
                     if(pull.permissions && guildId)
                         cmd.permissions.set({ permissions: pull.permissions });
                 }).then(embed.addField(pull.name, '✅')).catch(console.error);
-            } while(pull.guildId?.length > 0 && (pull.guild ?? false));
+            } while(pull.guildId?.length > 0 && (pull.guildId ?? false));
         });
 
         message.channel.send({ embeds: [embed] });
