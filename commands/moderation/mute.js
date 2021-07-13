@@ -83,6 +83,11 @@ module.exports = {
             return interaction.reply({ embeds: [embed] });
         }
 
+	if(targetId == client.application.owner.id) {
+	    embed.setTitle("You cannot mute my owner!");
+	    return interaction.reply({ embeds: [embed] });
+	}
+
         if(mutedRoles.some(key => targetMember.roles.cache.has(key))) {
             embed.setTitle("That user is already muted.");
             return interaction.reply({ embeds: [embed] });
